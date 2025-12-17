@@ -2,6 +2,7 @@
 
 require_relative "autosend_rb/version"
 require_relative "autosend_rb/config"
+require_relative "autosend_rb/api_response"
 
 require_relative "autosend_rb/concerns/client"
 
@@ -15,6 +16,7 @@ require_relative "autosend_rb/requests/send_email"
 require_relative "autosend_rb/responses/send_email"
 
 require_relative "autosend_rb/clients/mail"
+require_relative "autosend_rb/mail"
 
 module AutosendRb
   class ApiError < StandardError; end

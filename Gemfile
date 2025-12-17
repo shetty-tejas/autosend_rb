@@ -8,6 +8,8 @@ gemspec
 gem "debug"
 gem "irb"
 gem "minitest"
+gem "mocha"
+gem "simplecov", require: false
 gem "rake"
 gem "rubocop"
 gem "ruby-lsp"

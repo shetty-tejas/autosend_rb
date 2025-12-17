@@ -10,7 +10,7 @@ module AutosendRb
       attr_reader :file
 
       def initialize(file:)
-        raise TypeError, "file should be of type File or String" unless file.is_a?(File) || file.is_a?(String)
+        raise TypeError, "file should be of type File or String" unless file.is_a?(File) || file.is_a?(Tempfile) || file.is_a?(String)
         raise ArgumentError, "file should not be empty" if file.is_a?(String) && file.empty?
 
         @file = file

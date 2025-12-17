@@ -7,7 +7,19 @@ class TestAutosendRb < Minitest::Test
     refute_nil ::AutosendRb::VERSION
   end
 
-  def test_it_does_something_useful
-    assert false
+  def test_configuration
+    AutosendRb.configure do |config|
+      config.api_key = "test_key"
+    end
+
+    assert_equal "test_key", AutosendRb.config.api_key
+  end
+
+  def test_configuration_missing_key
+    AutosendRb.configure do |config|
+      config.api_key = nil
+    end
+
+    assert_raises(ArgumentError) { AutosendRb.config.api_key }
   end
 end
