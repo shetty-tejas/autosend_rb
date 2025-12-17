@@ -42,8 +42,8 @@ module AutosendRb
         @attachments = values.map { |v| Entities::Attachment.coerce(v) }
       end
 
-      def add_attachment(file)
-        @attachments << Entities::Attachment.coerce(file)
+      def add_attachment(value)
+        @attachments << Entities::Attachment.coerce(value)
       end
 
       def unsubscribe_group_id=(value)

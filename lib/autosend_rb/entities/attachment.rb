@@ -70,8 +70,6 @@ module AutosendRb
       class << self
         def coerce(value)
           return value if value.is_a?(self)
-
-          # If it's a File or String (path), wrap it
           return new(file: value) if value.is_a?(File) || value.is_a?(String)
 
           if value.is_a?(Hash)

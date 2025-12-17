@@ -1,38 +1,148 @@
 # AutosendRb
 
-TODO: Delete this and the text below, and describe your gem
-
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/autosend_rb`. To experiment with that code, run `bin/console` for an interactive prompt.
+A (hopefully, official soon) Ruby SDK for the AutoSend.com API, designed to be idiomatic, robust, and easy to use.
 
 ## Installation
 
-TODO: Replace `UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG` with your gem name right after releasing it to RubyGems.org. Please do not do it earlier due to security reasons. Alternatively, replace this section with instructions to install your gem from git if you don't plan to release to RubyGems.org.
+Add this line to your application's Gemfile:
 
-Install the gem and add to the application's Gemfile by executing:
-
-```bash
-bundle add UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+```ruby
+gem 'autosend_rb'
 ```
 
-If bundler is not being used to manage dependencies, install the gem by executing:
+And then execute:
 
 ```bash
-gem install UPDATE_WITH_YOUR_GEM_NAME_IMMEDIATELY_AFTER_RELEASE_TO_RUBYGEMS_ORG
+$ bundle install
+```
+
+Or install it yourself as:
+
+```bash
+$ gem install autosend_rb
+```
+
+## Configuration
+
+Configure the gem with your API key. You can do this in an initializer (e.g., `config/initializers/autosend.rb` in Rails).
+
+```ruby
+AutosendRb.configure do |config|
+  config.api_key = "your_api_key"
+  # config.api_host = "https://api.autosend.com" # Optional, defaults to production
+  # config.http_timeout = 10 # Optional, defaults to 10 seconds
+end
 ```
 
 ## Usage
 
-TODO: Write usage instructions here
+### Sending a Single Email
 
-## Development
+You can send an email using a clean, block-based syntax:
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake test` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
+```ruby
+response = AutosendRb::Mail.send do |email|
+  email.from = { email: "sender@example.com", name: "Sender Name" }
+  email.to = { email: "recipient@example.com", name: "Recipient Name" }
+  email.subject = "Welcome to Autosend!"
+  email.body = {
+    html: "<h1>Hello, {{name}}!</h1><p>Welcome to our service.</p>",
+    text: "Hello, {{name}}! Welcome to our service."
+    # Alternatively, use a template ID
+    # template_id: "template_12345"
+  }
+  
+  # Dynamic data for template variables
+  email.body.dynamic_data = { name: "John Doe" }
+  
+  # Attachments (File object, path string, or Hash with description)
+  email.add_attachment("path/to/invoice.pdf")
+  email.add_attachment({file: File.open("path/to/image.png"), description: "Product Image"})
+  email.add_attachment({file: "https://example.com/document.jpeg", description: "Document"})
+  email.add_attachment(File.open("path/to/terms.pdf"))
+end
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and the created tag, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+puts "Email sent! ID: #{response.email_id}"
+```
 
-## Contributing
+### Sending Bulk Emails
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/autosend_rb. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/autosend_rb/blob/master/CODE_OF_CONDUCT.md).
+Send the same email to multiple recipients with individual dynamic data:
+
+```ruby
+response = AutosendRb::Mail.bulk do |email|
+  email.from = { email: "sender@example.com", name: "Sender Name" }
+  email.subject = "Weekly Newsletter"
+  email.body = {
+    html: "<h1>Hello, {{name}}!</h1><p>Here is your weekly newsletter.</p>",
+    text: "Hello, {{name}}! Here is your weekly newsletter."
+    # Alternatively, use a template ID
+    # template_id: "template_67890"
+  }
+  
+  # Add recipients
+  email.add_recipient(
+    email: "alice@example.com", 
+    name: "Alice", 
+    dynamic_data: { name: "Alice" } 
+  )
+  
+  email.add_recipient(
+    email: "bob@example.com", 
+    name: "Bob", 
+    dynamic_data: { name: "Bob" } 
+  )
+end
+
+puts "Batch ID: #{response.batch_id}"
+puts "Success: #{response.success_count}, Failed: #{response.failed_count}"
+```
+
+### Using Request Objects
+
+If you prefer building request objects manually:
+
+```ruby
+request = AutosendRb::Requests::SendEmail.new
+request.from = { email: "sender@example.com" }
+request.to = { email: "recipient@example.com" }
+request.subject = "Manual Request"
+request.body = { html: "<p>Content</p>" }
+
+AutosendRb::Mail.send(request)
+```
+
+### Using Hash Payloads
+
+Or, you can pass a Hash directly:
+
+```ruby
+payload = {
+  from: { email: "sender@example.com" },
+  to: { email: "recipient@example.com" },
+  subject: "Hash Payload Request",
+  html: "<p>Content</p>",
+  text: "Content",
+  attachments: [
+    { file: "https://example.com/image.png", description: "An image" },
+    { file: File.open("path/to/document.pdf"), description: "A document" }
+  ]
+}
+
+AutosendRb::Mail.send(payload)
+```
+
+## Error Handling
+
+The SDK raises specific errors for API failures:
+
+*   `AutosendRb::BadRequestError` (400)
+*   `AutosendRb::UnauthorizedError` (401)
+*   `AutosendRb::PaymentRequiredError` (402)
+*   `AutosendRb::ForbiddenError` (403)
+*   `AutosendRb::NotFoundError` (404)
+*   `AutosendRb::TooManyRequestsError` (429)
+*   `AutosendRb::InternalServerErrorError` (500)
 
 ## License
 
@@ -40,4 +150,4 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the AutosendRb project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/autosend_rb/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the AutosendRb project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/shetty-tejas/autosend_rb/blob/master/CODE_OF_CONDUCT.md).
