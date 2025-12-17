@@ -5,6 +5,8 @@ require "net/http"
 
 module AutosendRb
   module Concerns
+    # Shared client functionality for making HTTP requests.
+    # @api private
     module Client
       private
 

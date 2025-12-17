@@ -6,9 +6,20 @@ require "uri"
 
 module AutosendRb
   module Entities
+    # Represents an email attachment.
     class Attachment
-      attr_reader :file, :description
+      # @return [File, Tempfile, String] The file object or path/URL to the file.
+      attr_reader :file
 
+      # @return [String, nil] A description of the attachment.
+      attr_reader :description
+
+      # Initializes a new Attachment.
+      #
+      # @param file [File, Tempfile, String] The file object, local path, or URL.
+      # @param description [String, nil] A description of the attachment.
+      # @raise [TypeError] If file is not a File, Tempfile, or String, or if description is not a String.
+      # @raise [ArgumentError] If file is an empty string.
       def initialize(file:, description: nil)
         unless file.is_a?(File) || file.is_a?(Tempfile) || file.is_a?(String)
           raise TypeError,
@@ -21,6 +32,10 @@ module AutosendRb
         @description = description
       end
 
+      # Converts the attachment to a hash for API transmission.
+      #
+      # @return [Hash] The hash representation of the attachment.
+      # @raise [ArgumentError] If the file path provided does not exist or cannot be read.
       def to_h
         if file.is_a?(File)
           return {
@@ -68,6 +83,11 @@ module AutosendRb
       end
 
       class << self
+        # Coerces a value into an Attachment object.
+        #
+        # @param value [Hash, File, String, Attachment] The value to coerce.
+        # @return [Attachment] The coerced Attachment object.
+        # @raise [ArgumentError] If the value cannot be coerced.
         def coerce(value)
           return value if value.is_a?(self)
           return new(file: value) if value.is_a?(File) || value.is_a?(String)

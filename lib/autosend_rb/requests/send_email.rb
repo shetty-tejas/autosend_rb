@@ -2,10 +2,27 @@
 
 module AutosendRb
   module Requests
+    # Request object for sending a single email.
     class SendEmail < Base
+      # @return [String] The email subject.
       attr_accessor :subject
-      attr_reader :to, :from, :reply_to, :attachments, :unsubscribe_group_id, :body
+      # @return [AutosendRb::Entities::Recipient] The recipient.
+      attr_reader :to
+      # @return [AutosendRb::Entities::Recipient] The sender.
+      attr_reader :from
+      # @return [AutosendRb::Entities::Recipient] The reply-to address.
+      attr_reader :reply_to
+      # @return [Array<AutosendRb::Entities::Attachment>] The list of attachments.
+      attr_reader :attachments
+      # @return [String] The unsubscribe group ID.
+      attr_reader :unsubscribe_group_id
+      # @return [AutosendRb::Entities::Body] The email body.
+      attr_reader :body
 
+      # Initializes a new SendEmail request.
+      #
+      # @param kwargs [Hash] Initial attributes.
+      # @yield [self] Block to configure the request.
       def initialize(**kwargs)
         super
         @attachments = []
@@ -13,38 +30,64 @@ module AutosendRb
         yield self if block_given?
       end
 
+      # Sets the recipient.
+      #
+      # @param value [Hash, String, AutosendRb::Entities::Recipient] The recipient.
       def to=(value)
         @to = Entities::Recipient.coerce(value)
       end
 
+      # Sets the sender.
+      #
+      # @param value [Hash, String, AutosendRb::Entities::Recipient] The sender.
       def from=(value)
         @from = Entities::Recipient.coerce(value)
       end
 
+      # Sets the reply-to address.
+      #
+      # @param value [Hash, String, AutosendRb::Entities::Recipient] The reply-to address.
       def reply_to=(value)
         @reply_to = Entities::Recipient.coerce(value)
       end
 
+      # Sets the email body.
+      #
+      # @param value [Hash, AutosendRb::Entities::Body] The email body.
       def body=(value)
         @body = Entities::Body.coerce(value)
       end
 
+      # Sets the attachments.
+      #
+      # @param values [Array<Hash, String, File, AutosendRb::Entities::Attachment>] The attachments.
+      # @raise [ArgumentError] if values is not an array.
       def attachments=(values)
         raise ArgumentError, "attachments must be an array" unless values.is_a?(Array)
 
         @attachments = values.map { |v| Entities::Attachment.coerce(v) }
       end
 
+      # Adds an attachment.
+      #
+      # @param value [Hash, String, File, AutosendRb::Entities::Attachment] The attachment.
       def add_attachment(value)
-          @attachments << Entities::Attachment.coerce(value)
+        @attachments << Entities::Attachment.coerce(value)
       end
 
+      # Sets the unsubscribe group ID.
+      #
+      # @param value [String] The unsubscribe group ID.
+      # @raise [ArgumentError] if value is not a string.
       def unsubscribe_group_id=(value)
         raise ArgumentError, "unsubscribe_group_id should be of type String" unless value.is_a?(String)
 
         @unsubscribe_group_id = value
       end
 
+      # Converts the request to a Hash.
+      #
+      # @return [Hash] The request payload.
       def to_h
         {
           to: to&.to_h,
@@ -57,6 +100,9 @@ module AutosendRb
         }.compact
       end
 
+      # Validates the request.
+      #
+      # @raise [ArgumentError] if the request is invalid.
       def validate!
         raise ArgumentError, "to and from details are required" if to.nil? || from.nil?
 

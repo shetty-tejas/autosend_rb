@@ -2,9 +2,24 @@
 
 module AutosendRb
   module Entities
+    # Represents an email recipient.
     class Recipient
-      attr_reader :email, :name, :dynamic_data
+      # @return [String] The email address of the recipient.
+      attr_reader :email
 
+      # @return [String, nil] The name of the recipient.
+      attr_reader :name
+
+      # @return [Hash, nil] Dynamic data for template substitution.
+      attr_reader :dynamic_data
+
+      # Initializes a new Recipient.
+      #
+      # @param email [String] The email address.
+      # @param name [String, nil] The name of the recipient.
+      # @param dynamic_data [Hash, nil] Dynamic data for template substitution.
+      # @raise [TypeError] If arguments are not of the expected type.
+      # @raise [ArgumentError] If email is blank or name is blank (but not nil).
       def initialize(email:, name: nil, dynamic_data: nil)
         raise TypeError, "email should be of type String" unless email.is_a?(String)
         raise TypeError, "name should be of type NilClass or String" unless name.nil? || name.is_a?(String)
@@ -22,6 +37,9 @@ module AutosendRb
         @dynamic_data = dynamic_data
       end
 
+      # Converts the recipient to a hash for API transmission.
+      #
+      # @return [Hash] The hash representation of the recipient.
       def to_h
         {
           email: email,
@@ -31,6 +49,11 @@ module AutosendRb
       end
 
       class << self
+        # Coerces a value into a Recipient object.
+        #
+        # @param value [Hash, Recipient] The value to coerce.
+        # @return [Recipient] The coerced Recipient object.
+        # @raise [ArgumentError] If the value cannot be coerced.
         def coerce(value)
           return value if value.is_a?(self)
 
