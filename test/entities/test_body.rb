@@ -4,8 +4,30 @@ require "test_helper"
 
 class TestBody < Minitest::Test
   def test_initialization
-    body = AutosendRb::Entities::Body.new(html: "<h1>Hi</h1>")
+    body = AutosendRb::Entities::Body.new(html: "<h1>Hi</h1>", dynamic_data: { "name" => "User" })
     assert_equal "<h1>Hi</h1>", body.html
+    assert_equal({ "name" => "User" }, body.dynamic_data)
+  end
+
+  def test_to_h
+    body = AutosendRb::Entities::Body.new(
+      html: "<p>Hi</p>",
+      dynamic_data: { "name" => "User" }
+    )
+    expected = {
+      html: "<p>Hi</p>",
+      dynamicData: { "name" => "User" }
+    }
+    assert_equal expected, body.to_h
+  end
+
+  def test_coerce
+    hash = { html: "<p>Hi</p>", dynamic_data: { "name" => "User" } }
+    body = AutosendRb::Entities::Body.coerce(hash)
+    
+    assert_instance_of AutosendRb::Entities::Body, body
+    assert_equal "<p>Hi</p>", body.html
+    assert_equal({ "name" => "User" }, body.dynamic_data)
   end
 
   def test_validation_success

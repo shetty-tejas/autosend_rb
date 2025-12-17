@@ -7,20 +7,23 @@ require "uri"
 module AutosendRb
   module Entities
     class Attachment
-      attr_reader :file
+      attr_reader :file, :description
 
-      def initialize(file:)
+      def initialize(file:, description: nil)
         raise TypeError, "file should be of type File or String" unless file.is_a?(File) || file.is_a?(Tempfile) || file.is_a?(String)
         raise ArgumentError, "file should not be empty" if file.is_a?(String) && file.empty?
+        raise TypeError, "description should be of type String" unless description.nil? || description.is_a?(String)
 
         @file = file
+        @description = description
       end
 
       def to_h
         if file.is_a?(File)
           return {
             filename: File.basename(file.path),
-            content: Base64.encode64(file.read)
+            content: Base64.encode64(file.read),
+            description: description
           }
         end
 
@@ -31,29 +34,36 @@ module AutosendRb
         end
 
         if uri && %w[http https].include?(uri.scheme)
-          {
+          return {
             filename: File.basename(uri.path),
-            fileUrl: file
+            fileUrl: file,
+            description: description
           }
-        else
-          path = (uri && uri.scheme == "file") ? uri.path : file
-
-          unless File.exist?(path)
-            raise ArgumentError, "file does not exist at path: #{path}"
-          end
-
-          begin
-            file_obj = File.open(path)
-            {
-              filename: File.basename(file_obj.path),
-              content: Base64.encode64(file_obj.read)
-            }
-          rescue SystemCallError => e
-            raise ArgumentError, "could not read file at #{path}: #{e.message}"
-          ensure
-            file_obj&.close
-          end
         end
+        
+        path = (uri && uri.scheme == "file") ? uri.path : file
+
+        unless File.exist?(path)
+          raise ArgumentError, "file does not exist at path: #{path}"
+        end
+
+        result = {}
+
+        begin
+          f = File.open(path)
+
+          result = {
+            filename: File.basename(f.path),
+            content: Base64.encode64(f.read),
+            description: description
+          }
+        rescue SystemCallError => e
+          raise ArgumentError, "could not read file at #{path}: #{e.message}"
+        ensure
+          f&.close
+        end
+
+        return result
       end
 
       class << self
@@ -63,7 +73,12 @@ module AutosendRb
           # If it's a File or String (path), wrap it
           return new(file: value) if value.is_a?(File) || value.is_a?(String)
 
-          raise ArgumentError, "Invalid attachment. Must be a File, path String, or #{name}"
+          if value.is_a?(Hash)
+            value = value.transform_keys(&:to_sym)
+            return new(file: value[:file], description: value[:description])
+          end
+
+          raise ArgumentError, "Invalid attachment. Must be a File, path String, Hash, or #{name}"
         end
       end
     end

@@ -3,19 +3,21 @@
 module AutosendRb
   module Entities
     class Body
-      attr_accessor :html, :text, :template_id
+      attr_accessor :html, :text, :template_id, :dynamic_data
 
-      def initialize(html: nil, text: nil, template_id: nil)
+      def initialize(html: nil, text: nil, template_id: nil, dynamic_data: nil)
         @html = html
         @text = text
         @template_id = template_id
+        @dynamic_data = dynamic_data
       end
 
       def to_h
         {
           html: html,
           text: text,
-          templateId: template_id
+          templateId: template_id,
+          dynamicData: dynamic_data
         }.compact
       end
 
@@ -35,7 +37,12 @@ module AutosendRb
 
           if value.is_a?(Hash)
             value = value.transform_keys(&:to_sym)
-            return new(html: value[:html], text: value[:text], template_id: value[:template_id])
+            return new(
+              html: value[:html],
+              text: value[:text],
+              template_id: value[:template_id],
+              dynamic_data: value[:dynamic_data]
+            )
           end
 
           raise ArgumentError, "Invalid body. Must be a Hash or #{name}"
