@@ -2,6 +2,8 @@
 
 A (hopefully, official soon) Ruby SDK for the AutoSend.com API, designed to be idiomatic, robust, and easy to use.
 
+##### NOTE: This is currently under heavy development, and hence I have not deployed it as a gem yet. So, if you wanna use it, use it wisely 😜
+
 ## Installation
 
 Add this line to your application's Gemfile:
