@@ -28,4 +28,21 @@ class TestMail < Minitest::Test
       end
     end
   end
+
+  def test_bulk_with_block
+    AutosendRb::Clients::Mail.expects(:bulk).with(instance_of(AutosendRb::Requests::BulkEmail), raise_error: false)
+
+    AutosendRb::Mail.bulk do |email|
+      email.subject = "Bulk Test"
+      email.from = { email: "sender@example.com" }
+      email.recipients << { email: "r1@example.com" }
+    end
+  end
+
+  def test_bulk_with_payload
+    payload = AutosendRb::Requests::BulkEmail.new
+    AutosendRb::Clients::Mail.expects(:bulk).with(payload, raise_error: false)
+
+    AutosendRb::Mail.bulk(payload)
+  end
 end

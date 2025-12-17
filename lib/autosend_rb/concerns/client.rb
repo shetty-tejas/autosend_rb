@@ -19,7 +19,7 @@ module AutosendRb
         raise ArgumentError, "path should be a string" unless path.is_a?(String)
 
         uri = URI::HTTPS.build(host: AutosendRb.config.api_host, path: path)
-        
+
         request = Net::HTTP::Post.new(uri).tap do |r|
           r.body = JSON.generate(body)
 
@@ -28,7 +28,8 @@ module AutosendRb
           end
         end
 
-        Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, open_timeout: AutosendRb.config.http_timeout, read_timeout: AutosendRb.config.http_timeout) do |http|
+        Net::HTTP.start(uri.hostname, uri.port, use_ssl: true, open_timeout: AutosendRb.config.http_timeout,
+                                                read_timeout: AutosendRb.config.http_timeout) do |http|
           http.request(request)
         end
       end

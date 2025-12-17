@@ -14,7 +14,12 @@ module AutosendRb
           AutosendRb::Responses::SendEmail.new(response.body["data"])
         end
 
-        def bulk
+        def bulk(payload, raise_error: false)
+          payload.validate! if payload.respond_to?(:validate!)
+          payload = payload.to_h if payload.respond_to?(:to_h)
+
+          response = ApiResponse.new(post(path: "/mails/bulk", body: payload), raise_error: raise_error)
+          AutosendRb::Responses::BulkEmail.new(response.body["data"])
         end
       end
     end

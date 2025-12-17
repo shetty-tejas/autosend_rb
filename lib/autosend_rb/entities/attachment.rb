@@ -10,7 +10,10 @@ module AutosendRb
       attr_reader :file, :description
 
       def initialize(file:, description: nil)
-        raise TypeError, "file should be of type File or String" unless file.is_a?(File) || file.is_a?(Tempfile) || file.is_a?(String)
+        unless file.is_a?(File) || file.is_a?(Tempfile) || file.is_a?(String)
+          raise TypeError,
+                "file should be of type File or String"
+        end
         raise ArgumentError, "file should not be empty" if file.is_a?(String) && file.empty?
         raise TypeError, "description should be of type String" unless description.nil? || description.is_a?(String)
 
@@ -40,12 +43,10 @@ module AutosendRb
             description: description
           }
         end
-        
-        path = (uri && uri.scheme == "file") ? uri.path : file
 
-        unless File.exist?(path)
-          raise ArgumentError, "file does not exist at path: #{path}"
-        end
+        path = uri && uri.scheme == "file" ? uri.path : file
+
+        raise ArgumentError, "file does not exist at path: #{path}" unless File.exist?(path)
 
         result = {}
 
@@ -63,7 +64,7 @@ module AutosendRb
           f&.close
         end
 
-        return result
+        result
       end
 
       class << self

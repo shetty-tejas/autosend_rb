@@ -37,7 +37,8 @@ class TestRecipient < Minitest::Test
   end
 
   def test_coerce_hash
-    recipient = AutosendRb::Entities::Recipient.coerce({ email: "test@example.com", name: "Test", dynamic_data: { "a" => 1 } })
+    recipient = AutosendRb::Entities::Recipient.coerce({ email: "test@example.com", name: "Test",
+                                                         dynamic_data: { "a" => 1 } })
     assert_instance_of AutosendRb::Entities::Recipient, recipient
     assert_equal "test@example.com", recipient.email
     assert_equal({ "a" => 1 }, recipient.dynamic_data)

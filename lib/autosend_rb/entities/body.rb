@@ -22,13 +22,14 @@ module AutosendRb
       end
 
       def validate!
-        if template_id && (html || text)
-          raise ArgumentError, "cannot provide html/text when template_id is present"
-        end
+        raise ArgumentError, "cannot provide html/text when template_id is present" if template_id && (html || text)
 
-        unless template_id
-          raise ArgumentError, "html or text is required when not using a template" if (html.nil? || html.empty?) && (text.nil? || text.empty?)
-        end
+        return if template_id
+
+        return unless (html.nil? || html.empty?) && (text.nil? || text.empty?)
+
+        raise ArgumentError,
+              "html or text is required when not using a template"
       end
 
       class << self

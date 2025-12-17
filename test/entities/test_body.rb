@@ -24,7 +24,7 @@ class TestBody < Minitest::Test
   def test_coerce
     hash = { html: "<p>Hi</p>", dynamic_data: { "name" => "User" } }
     body = AutosendRb::Entities::Body.coerce(hash)
-    
+
     assert_instance_of AutosendRb::Entities::Body, body
     assert_equal "<p>Hi</p>", body.html
     assert_equal({ "name" => "User" }, body.dynamic_data)
@@ -41,7 +41,7 @@ class TestBody < Minitest::Test
   def test_validation_conflict
     body = AutosendRb::Entities::Body.new(html: "<h1>Hi</h1>", template_id: "tmpl_123")
     error = assert_raises(ArgumentError) { body.validate! }
-    assert_match(/cannot provide html\/text when template_id is present/, error.message)
+    assert_match(%r{cannot provide html/text when template_id is present}, error.message)
   end
 
   def test_validation_missing_content

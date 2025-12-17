@@ -2,19 +2,26 @@
 
 module AutosendRb
   module Requests
-    class SendEmail < Base
+    class BulkEmail < Base
       attr_accessor :subject
-      attr_reader :to, :from, :reply_to, :attachments, :unsubscribe_group_id, :body
+      attr_reader :recipients, :from, :reply_to, :attachments, :unsubscribe_group_id, :body
 
       def initialize(**kwargs)
         super
+        @recipients = []
         @attachments = []
 
         yield self if block_given?
       end
 
-      def to=(value)
-        @to = Entities::Recipient.coerce(value)
+      def recipients=(values)
+        raise ArgumentError, "recipients must be an array" unless values.is_a?(Array)
+
+        @recipients = values.map { |v| Entities::Recipient.coerce(v) }
+      end
+
+      def add_recipient(value)
+        @recipients << Entities::Recipient.coerce(value)
       end
 
       def from=(value)
@@ -47,7 +54,7 @@ module AutosendRb
 
       def to_h
         {
-          to: to&.to_h,
+          recipients: recipients.map(&:to_h),
           from: from&.to_h,
           replyTo: reply_to&.to_h,
           subject: subject,
@@ -58,7 +65,8 @@ module AutosendRb
       end
 
       def validate!
-        raise ArgumentError, "to and from details are required" if to.nil? || from.nil?
+        raise ArgumentError, "recipients and from details are required" if recipients.empty? || from.nil?
+        raise ArgumentError, "maximum 100 recipients allowed" if recipients.size > 100
 
         validate_body!
         validate_attachments!

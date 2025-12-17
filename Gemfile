@@ -9,9 +9,9 @@ gem "debug"
 gem "irb"
 gem "minitest"
 gem "mocha"
-gem "simplecov", require: false
 gem "rake"
 gem "rubocop"
 gem "ruby-lsp"
+gem "simplecov", require: false
 gem "vcr", require: "vcr"
 gem "webmock", require: "webmock/minitest"

@@ -8,7 +8,11 @@ module AutosendRb
       def initialize(email:, name: nil, dynamic_data: nil)
         raise TypeError, "email should be of type String" unless email.is_a?(String)
         raise TypeError, "name should be of type NilClass or String" unless name.nil? || name.is_a?(String)
-        raise TypeError, "dynamic_data should be of type NilClass or Hash" unless dynamic_data.nil? || dynamic_data.is_a?(Hash)
+
+        unless dynamic_data.nil? || dynamic_data.is_a?(Hash)
+          raise TypeError,
+                "dynamic_data should be of type NilClass or Hash"
+        end
 
         raise ArgumentError, "email can't be blank" if email.empty?
         raise ArgumentError, "name can't be blank" if name&.empty?

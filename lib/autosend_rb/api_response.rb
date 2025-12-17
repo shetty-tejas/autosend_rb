@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module AutosendRb
   class ApiResponse
     attr_reader :response

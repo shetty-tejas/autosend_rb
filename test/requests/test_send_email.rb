@@ -72,7 +72,7 @@ class TestSendEmailRequest < Minitest::Test
     )
 
     error = assert_raises(ArgumentError) { request.validate! }
-    assert_match(/cannot provide html\/text when template_id is present/, error.message)
+    assert_match(%r{cannot provide html/text when template_id is present}, error.message)
   end
 
   def test_validation_missing_subject_without_template

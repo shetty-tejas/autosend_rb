@@ -12,8 +12,10 @@ require_relative "autosend_rb/entities/body"
 
 require_relative "autosend_rb/requests/base"
 require_relative "autosend_rb/requests/send_email"
+require_relative "autosend_rb/requests/bulk_email"
 
 require_relative "autosend_rb/responses/send_email"
+require_relative "autosend_rb/responses/bulk_email"
 
 require_relative "autosend_rb/clients/mail"
 require_relative "autosend_rb/mail"
