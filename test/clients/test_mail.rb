@@ -2,6 +2,7 @@
 
 require "test_helper"
 
+# TODO: This should be backed by VCR once we have it set up.
 class TestClientsMail < Minitest::Test
   def setup
     AutosendRb.configure do |config|

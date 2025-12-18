@@ -7,6 +7,7 @@ gemspec
 
 gem "debug"
 gem "irb"
+gem "mail"
 gem "minitest"
 gem "mocha"
 gem "rake"
@@ -15,3 +16,5 @@ gem "ruby-lsp"
 gem "simplecov", require: false
 gem "vcr", require: "vcr"
 gem "webmock", require: "webmock/minitest"
+
+gem "rails", group: :test

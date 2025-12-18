@@ -49,4 +49,33 @@ class TestBody < Minitest::Test
     error = assert_raises(ArgumentError) { body.validate! }
     assert_match(/html or text is required/, error.message)
   end
+
+  def test_body_for_html_and_text_with_api_schema
+    body = AutosendRb::Entities::Body.coerce({ html: "<h1>Hello</h1>", text: "Hello",
+                                               dynamic_data: { "name" => "User" } })
+    expected = {
+      html: "<h1>Hello</h1>",
+      text: "Hello",
+      dynamicData: { "name" => "User" }
+    }
+    assert_equal expected, body.to_h
+  end
+
+  def test_body_for_template_id_with_api_schema
+    body = AutosendRb::Entities::Body.coerce({ template_id: "tmpl_123" })
+    expected = {
+      templateId: "tmpl_123"
+    }
+    assert_equal expected, body.to_h
+  end
+
+  def test_body_for_both_with_api_schema
+    body = AutosendRb::Entities::Body.coerce({ template_id: "tmpl_123", html: "<h1>Hello</h1>", text: "Hello" })
+    expected = {
+      templateId: "tmpl_123",
+      html: "<h1>Hello</h1>",
+      text: "Hello"
+    }
+    assert_equal expected, body.to_h
+  end
 end

@@ -4,8 +4,8 @@ module AutosendRb
   module Requests
     # Request object for sending bulk emails.
     class BulkEmail < Base
-      # @return [String] The email subject.
-      attr_accessor :subject
+      # @return [String, nil] The email subject.
+      attr_writer :subject
       # @return [Array<AutosendRb::Entities::Recipient>] The list of recipients.
       attr_reader :recipients
       # @return [AutosendRb::Entities::Recipient] The sender.
@@ -18,6 +18,8 @@ module AutosendRb
       attr_reader :unsubscribe_group_id
       # @return [AutosendRb::Entities::Body] The email body.
       attr_reader :body
+      # @return [Hash] The email personalization data.
+      attr_reader :dynamic_data
 
       # Initializes a new BulkEmail request.
       #
@@ -25,10 +27,17 @@ module AutosendRb
       # @yield [self] Block to configure the request.
       def initialize(**kwargs)
         super
-        @recipients = []
-        @attachments = []
 
-        yield self if block_given?
+        @recipients ||= []
+        @attachments ||= []
+      end
+
+      # Gets the subject.
+      # @return [String, nil] The email subject.
+      def subject
+        return nil if body&.template_id
+
+        @subject
       end
 
       # Sets the recipients.
@@ -57,8 +66,10 @@ module AutosendRb
 
       # Sets the reply-to address.
       #
-      # @param value [Hash, String, AutosendRb::Entities::Recipient] The reply-to address.
+      # @param value [Nil, Hash, String, AutosendRb::Entities::Recipient] The reply-to address.
       def reply_to=(value)
+        return if value.nil?
+
         @reply_to = Entities::Recipient.coerce(value)
       end
 
@@ -88,12 +99,22 @@ module AutosendRb
 
       # Sets the unsubscribe group ID.
       #
-      # @param value [String] The unsubscribe group ID.
+      # @param value [Nil, String] The unsubscribe group ID.
       # @raise [ArgumentError] if value is not a string.
       def unsubscribe_group_id=(value)
+        return if value.nil?
         raise ArgumentError, "unsubscribe_group_id should be of type String" unless value.is_a?(String)
 
         @unsubscribe_group_id = value
+      end
+
+      # Sets the dynamic data.
+      # @param value [Hash] The dynamic data.
+      # @raise [ArgumentError] if value is not a hash.
+      def dynamic_data=(value)
+        raise ArgumentError, "dynamic_data should be of type Hash" unless value.is_a?(Hash)
+
+        @dynamic_data = value
       end
 
       # Converts the request to a Hash.
@@ -107,6 +128,7 @@ module AutosendRb
           subject: subject,
           unsubscribeGroupId: unsubscribe_group_id,
           attachments: attachments.map(&:to_h),
+          dynamicData: dynamic_data,
           **body.to_h
         }.compact
       end

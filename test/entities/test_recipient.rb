@@ -49,4 +49,15 @@ class TestRecipient < Minitest::Test
     coerced = AutosendRb::Entities::Recipient.coerce(original)
     assert_same original, coerced
   end
+
+  def test_recipient_with_api_schema
+    recipient = AutosendRb::Entities::Recipient.coerce({ email: "test@example.com", name: "Test User",
+                                                         dynamic_data: { "code" => "123" } })
+    expected = {
+      email: "test@example.com",
+      name: "Test User",
+      dynamicData: { "code" => "123" }
+    }
+    assert_equal expected, recipient.to_h
+  end
 end

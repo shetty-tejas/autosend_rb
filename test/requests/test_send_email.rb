@@ -7,8 +7,8 @@ class TestSendEmailRequest < Minitest::Test
     @valid_recipient = { email: "test@example.com", name: "Test User" }
   end
 
-  def test_initialization_with_block
-    request = AutosendRb::Requests::SendEmail.new do |r|
+  def test_initialization_with_build
+    request = AutosendRb::Requests::SendEmail.build do |r|
       r.subject = "Hello"
       r.to = @valid_recipient
       r.from = @valid_recipient
@@ -113,5 +113,72 @@ class TestSendEmailRequest < Minitest::Test
     assert_equal "Hello", hash[:subject]
     assert_equal "test@example.com", hash[:to][:email]
     assert_equal "<h1>Hi</h1>", hash[:html]
+  end
+
+  def test_against_api_for_html_with_file_attachment_schema
+    f1 = Tempfile.new(["test1", ".txt"])
+    f1.write("This is a test file.")
+    f1.rewind
+    request = AutosendRb::Requests::SendEmail.new(
+      subject: "Hello",
+      to: @valid_recipient,
+      from: @valid_recipient,
+      reply_to: @valid_recipient,
+      body: { html: "<h1>Hi</h1>", text: "Hi" },
+      attachments: [{ file: f1, description: "Test File" },
+                    { file: File.open("test/fixtures/img.jpeg"), description: "Catto" }],
+      unsubscribe_group_id: "group_123",
+      dynamic_data: { user_id: 123 }
+    )
+
+    expected_hash = {
+      subject: "Hello",
+      to: { email: "test@example.com", name: "Test User" },
+      from: { email: "test@example.com", name: "Test User" },
+      replyTo: { email: "test@example.com", name: "Test User" },
+      html: "<h1>Hi</h1>",
+      text: "Hi",
+      attachments: [
+        { filename: File.basename(f1.path),
+          content: Base64.strict_encode64("This is a test file."),
+          description: "Test File" },
+        { filename: "img.jpeg",
+          content: Base64.strict_encode64(File.read("test/fixtures/img.jpeg")),
+          description: "Catto" }
+      ],
+      unsubscribeGroupId: "group_123",
+      dynamicData: { user_id: 123 }
+    }
+    assert_equal expected_hash, request.to_h
+  end
+
+  def test_against_api_for_template_id_with_url_attachment_schema
+    request = AutosendRb::Requests::SendEmail.new(
+      to: @valid_recipient,
+      from: @valid_recipient,
+      reply_to: @valid_recipient,
+      body: { template_id: "tmpl_123" },
+      attachments: ["https://sample-files.com/downloads/documents/pdf/basic-text.pdf",
+                    { file: "test/fixtures/img.jpeg", description: "Catto" }],
+      unsubscribe_group_id: "group_123",
+      dynamic_data: { user_id: 123 }
+    )
+
+    expected_hash = {
+      to: { email: "test@example.com", name: "Test User" },
+      from: { email: "test@example.com", name: "Test User" },
+      replyTo: { email: "test@example.com", name: "Test User" },
+      templateId: "tmpl_123",
+      attachments: [
+        { filename: "basic-text.pdf",
+          fileUrl: "https://sample-files.com/downloads/documents/pdf/basic-text.pdf" },
+        { filename: "img.jpeg",
+          content: Base64.strict_encode64(File.read("test/fixtures/img.jpeg")),
+          description: "Catto" }
+      ],
+      unsubscribeGroupId: "group_123",
+      dynamicData: { user_id: 123 }
+    }
+    assert_equal expected_hash, request.to_h
   end
 end

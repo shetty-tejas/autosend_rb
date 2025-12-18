@@ -3,6 +3,8 @@
 require_relative "autosend_rb/version"
 require_relative "autosend_rb/config"
 require_relative "autosend_rb/api_response"
+require_relative "autosend_rb/railtie" if defined?(Rails) && defined?(ActionMailer)
+require_relative "autosend_rb/utils"
 
 require_relative "autosend_rb/concerns/client"
 
@@ -21,8 +23,12 @@ require_relative "autosend_rb/clients/mail"
 require_relative "autosend_rb/mail"
 
 module AutosendRb
+  # Base error class for all AutosendRb errors
+  class Error < StandardError; end
+  # Raised when there is a configuration error
+  class ConfigurationError < Error; end
   # Base error class for all API errors
-  class ApiError < StandardError; end
+  class ApiError < Error; end
   # Raised when the API returns a 400 Bad Request
   class BadRequestError < ApiError; end
   # Raised when the API returns a 401 Unauthorized
