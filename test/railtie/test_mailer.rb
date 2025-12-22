@@ -47,10 +47,19 @@ class IntegrationTestMailer < ActionMailer::Base
     end
   end
 
-  def with_multiple_recipients(to_list, subject)
+  def with_multiple_recipients_text(to_list, subject)
+    headers["unsubscribe_group_id"] = "group_123"
+
     mail(to: to_list, subject: subject) do |format|
       format.text { render plain: "bulk text" }
     end
+  end
+
+  def with_multiple_recipients_template(to_list, _subject)
+    headers["unsubscribe_group_id"] = "group_123"
+    headers["template_id"] = "tmpl_123"
+
+    mail(to: to_list, body: "")
   end
 
   def with_display_name(to, subject)
@@ -73,6 +82,7 @@ class IntegrationTestMailer < ActionMailer::Base
 
   def with_unsubscribe_group(to)
     headers["unsubscribe_group_id"] = "group_123"
+
     mail(to: to, subject: "Unsubscribe Test") do |format|
       format.text { render plain: "text" }
     end
@@ -154,7 +164,7 @@ class TestMailerIntegration < Minitest::Test
     IntegrationTestMailer.with_attachment("recipient@example.com", "Test Subject").deliver_now
   end
 
-  def test_multiple_recipients_uses_bulk
+  def test_multiple_recipients_uses_bulk_with_text
     recipients = ["a@example.com", "b@example.com"]
 
     AutosendRb::Clients::Mail.expects(:bulk).with do |payload|
@@ -162,10 +172,30 @@ class TestMailerIntegration < Minitest::Test
       assert_equal "a@example.com", payload.recipients[0].email
       assert_equal "b@example.com", payload.recipients[1].email
       assert_equal "bulk text", payload.body.text
+      assert_equal "group_123", payload.unsubscribe_group_id
       true
     end.returns({ "id" => "bulk_123" })
 
-    IntegrationTestMailer.with_multiple_recipients(recipients, "Bulk Subject").deliver_now
+    IntegrationTestMailer.with_multiple_recipients_text(recipients, "Bulk Subject").deliver_now
+  end
+
+  def test_multiple_recipients_uses_bulk_with_template
+    recipients = ["a@example.com", "b@example.com"]
+
+    AutosendRb::Clients::Mail.expects(:bulk).with do |payload|
+      assert_equal 2, payload.recipients.size
+      assert_equal "a@example.com", payload.recipients[0].email
+      assert_equal "b@example.com", payload.recipients[1].email
+      assert_equal "tmpl_123", payload.body.template_id
+      assert_equal "group_123", payload.unsubscribe_group_id
+
+      assert_nil payload.subject
+      assert_nil payload.body.text
+      assert_nil payload.body.html
+      true
+    end.returns({ "id" => "bulk_123" })
+
+    IntegrationTestMailer.with_multiple_recipients_template(recipients, "Bulk Subject").deliver_now
   end
 
   def test_with_display_name

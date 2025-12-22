@@ -22,7 +22,8 @@ class TestClientsMail < Minitest::Test
     @mock.stubs(:code).returns("200")
 
     # Mock the post method which comes from Concerns::Client
-    AutosendRb::Clients::Mail.expects(:post).with(path: "/mails/send", body: payload).returns(@mock)
+    Net::HTTP.expects(:start).returns(@mock)
+    URI::HTTPS.expects(:build).with(host: AutosendRb.config.api_host, path: "/v1/mails/send").once.returns(URI("https://api.autosend.com/v1/mails/send"))
 
     response = AutosendRb::Clients::Mail.send(payload)
 
@@ -46,7 +47,8 @@ class TestClientsMail < Minitest::Test
     @mock.stubs(:code).returns("200")
 
     # Mock the post method which comes from Concerns::Client
-    AutosendRb::Clients::Mail.expects(:post).with(path: "/mails/bulk", body: payload).returns(@mock)
+    Net::HTTP.expects(:start).returns(@mock)
+    URI::HTTPS.expects(:build).with(host: AutosendRb.config.api_host, path: "/v1/mails/bulk").once.returns(URI("https://api.autosend.com/v1/mails/bulk"))
 
     response = AutosendRb::Clients::Mail.bulk(payload)
 

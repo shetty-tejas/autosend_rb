@@ -9,7 +9,7 @@ SimpleCov.start do
   enable_coverage :branch
 
   minimum_coverage 90
-  minimum_coverage_by_file 40
+  minimum_coverage_by_file 75
 
   formatter SimpleCov::Formatter::MultiFormatter.new([
                                                        SimpleCov::Formatter::HTMLFormatter,
