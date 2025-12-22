@@ -121,7 +121,7 @@ module AutosendRb
 
       def build_from_raw
         {
-          filename: file[:filename],
+          fileName: file[:filename],
           content: Base64.strict_encode64(file[:content]),
           contentType: file[:content_type]
         }
@@ -130,7 +130,7 @@ module AutosendRb
       def build_from_file_obj
         file.rewind
         {
-          filename: File.basename(file.path),
+          fileName: File.basename(file.path),
           content: Base64.strict_encode64(file.read)
         }.tap { |_| file.rewind }
       end
@@ -145,7 +145,7 @@ module AutosendRb
         end
 
         {
-          filename: filename || File.basename(URI.parse(url).path),
+          fileName: filename || File.basename(URI.parse(url).path),
           fileUrl: url
         }
       end
@@ -163,7 +163,7 @@ module AutosendRb
 
         content = File.read(path)
         {
-          filename: filename || File.basename(path),
+          fileName: filename || File.basename(path),
           content: Base64.strict_encode64(content)
         }
       rescue SystemCallError => e

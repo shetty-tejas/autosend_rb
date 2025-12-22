@@ -123,26 +123,26 @@ class TestMailerIntegration < Minitest::Test
       assert_equal 4, payload.attachments.size
       [
         {
-          filename: "invoice.pdf",
+          fileName: "invoice.pdf",
           content: Base64.strict_encode64("fake pdf content"),
           contentType: "application/pdf"
         },
         {
-          filename: "img.jpeg",
+          fileName: "img.jpeg",
           content: Base64.strict_encode64(File.read(File.join(__dir__, "..", "fixtures", "img.jpeg")))
         },
         {
-          filename: "url_file.pdf",
+          fileName: "url_file.pdf",
           fileUrl: "https://sample-files.com/downloads/documents/pdf/basic-text.pdf"
         },
         {
-          filename: "url_file2.pdf",
+          fileName: "url_file2.pdf",
           fileUrl: "https://sample-files.com/downloads/documents/pdf/basic-text.pdf",
           description: "Sample URL File2"
         }
       ].each_with_index do |expected_att, index|
         att = payload.attachments[index].to_h
-        assert_equal expected_att[:filename], att[:filename]
+        assert_equal expected_att[:fileName], att[:fileName]
         assert_equal expected_att[:content], att[:content] if expected_att.key?(:content)
         assert_equal expected_att[:fileUrl], att[:fileUrl] if expected_att.key?(:fileUrl)
         assert_equal expected_att[:description], att[:description] if expected_att.key?(:description)
