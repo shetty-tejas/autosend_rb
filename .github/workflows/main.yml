@@ -47,5 +47,4 @@ jobs:
       - uses: shetty-tejas/simplecov-coverage-reporter@v1.1
         if: github.event_name == 'pull_request'
         with:
-          working-directory: backend
           token: ${{ secrets.GITHUB_TOKEN }}
