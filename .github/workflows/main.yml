@@ -2,10 +2,9 @@ name: Ruby
 
 on:
   push:
-    branches:
-      - master
-
+    branches: [master]
   pull_request:
+    branches: [master]
 
 jobs:
   build:
@@ -44,6 +43,22 @@ jobs:
           bundler-cache: true
       - name: Run the default task
         run: bundle exec rake
+
+  coverage:
+    runs-on: ubuntu-latest
+    name: Coverage
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.4.8
+          bundler-cache: true
+      - name: Run tests
+        run: bundle exec rake test
       - uses: shetty-tejas/simplecov-coverage-reporter@v1.1
         if: github.event_name == 'pull_request'
         with:
