@@ -18,6 +18,4 @@ group :test do
   gem "rails"
   gem "simplecov", require: false
   gem "simplecov_json_formatter", github: "shetty-tejas/simplecov_json_formatter", require: false
-  gem "vcr", require: "vcr"
-  gem "webmock", require: "webmock/minitest"
 end
