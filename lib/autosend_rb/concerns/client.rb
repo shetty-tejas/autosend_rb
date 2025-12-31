@@ -37,7 +37,7 @@ module AutosendRb
         raise TypeError, "method should be a Net::HTTPRequest" unless method < Net::HTTPRequest
         raise ArgumentError, "path should be a string" unless path.is_a?(String)
 
-        uri = URI::HTTPS.build(host: AutosendRb.config.api_host, path: path)
+        uri = URI::HTTPS.build(host: AutosendRb.config.api_host, path: build_full_path(path))
 
         req = method.new(uri).tap do |r|
           r.body = JSON.generate(body) if body
@@ -51,6 +51,10 @@ module AutosendRb
                                                 read_timeout: AutosendRb.config.http_timeout) do |http|
           http.request(req)
         end
+      end
+
+      def build_full_path(path)
+        "/#{AutosendRb.config.api_version}/#{path}".squeeze("/")
       end
     end
   end

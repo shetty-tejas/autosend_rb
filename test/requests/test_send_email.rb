@@ -139,10 +139,10 @@ class TestSendEmailRequest < Minitest::Test
       html: "<h1>Hi</h1>",
       text: "Hi",
       attachments: [
-        { filename: File.basename(f1.path),
+        { fileName: File.basename(f1.path),
           content: Base64.strict_encode64("This is a test file."),
           description: "Test File" },
-        { filename: "img.jpeg",
+        { fileName: "img.jpeg",
           content: Base64.strict_encode64(File.read("test/fixtures/img.jpeg")),
           description: "Catto" }
       ],
@@ -170,9 +170,9 @@ class TestSendEmailRequest < Minitest::Test
       replyTo: { email: "test@example.com", name: "Test User" },
       templateId: "tmpl_123",
       attachments: [
-        { filename: "basic-text.pdf",
+        { fileName: "basic-text.pdf",
           fileUrl: "https://sample-files.com/downloads/documents/pdf/basic-text.pdf" },
-        { filename: "img.jpeg",
+        { fileName: "img.jpeg",
           content: Base64.strict_encode64(File.read("test/fixtures/img.jpeg")),
           description: "Catto" }
       ],

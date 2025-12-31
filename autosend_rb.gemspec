@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ["Tejas"]
   spec.email = ["tejas.shetty@mailbox.org"]
 
-  spec.summary = "Ruby client for Autosend"
+  spec.summary = "Ruby client for AutoSend.com"
   spec.description = spec.summary
   spec.homepage = "https://github.com/shetty-tejas/autosend_rb"
   spec.license = "MIT"
@@ -31,5 +31,5 @@ Gem::Specification.new do |spec|
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "openssl"
+  spec.add_runtime_dependency "openssl"
 end

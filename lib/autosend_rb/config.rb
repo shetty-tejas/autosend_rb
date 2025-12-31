@@ -12,11 +12,14 @@ module AutosendRb
     attr_accessor :api_host
     # @return [Integer] The HTTP timeout in seconds. Defaults to 10.
     attr_accessor :http_timeout
+    # @return [String] The API version. Defaults to "v1".
+    attr_accessor :api_version
     # @return [String, Proc] The API key.
     attr_writer :api_key
 
     def initialize
       self.api_host = "api.autosend.com"
+      self.api_version = "v1"
       self.http_timeout = 10
     end
 

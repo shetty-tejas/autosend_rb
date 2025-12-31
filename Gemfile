@@ -8,14 +8,14 @@ gemspec
 gem "debug"
 gem "irb"
 gem "mail"
-gem "minitest"
-gem "mocha"
 gem "rake"
-gem "rubocop"
-gem "ruby-lsp"
-gem "simplecov", require: false
-gem "simplecov_json_formatter", github: "shetty-tejas/simplecov_json_formatter", require: false
-gem "vcr", require: "vcr"
-gem "webmock", require: "webmock/minitest"
+gem "rubocop", require: false
+gem "ruby-lsp", require: false
 
-gem "rails", group: :test
+group :test do
+  gem "minitest"
+  gem "mocha"
+  gem "rails"
+  gem "simplecov", require: false
+  gem "simplecov_json_formatter", github: "shetty-tejas/simplecov_json_formatter", require: false
+end

@@ -12,7 +12,7 @@ class TestAttachment < Minitest::Test
     attachment = AutosendRb::Entities::Attachment.new(file: file)
     hash = attachment.to_h
 
-    assert_equal File.basename(file.path), hash[:filename]
+    assert_equal File.basename(file.path), hash[:fileName]
     assert_equal Base64.strict_encode64("hello world"), hash[:content]
   ensure
     file&.close
@@ -27,7 +27,7 @@ class TestAttachment < Minitest::Test
     attachment = AutosendRb::Entities::Attachment.new(file: file.path)
     hash = attachment.to_h
 
-    assert_equal File.basename(file.path), hash[:filename]
+    assert_equal File.basename(file.path), hash[:fileName]
     assert_equal Base64.strict_encode64("hello path"), hash[:content]
   ensure
     file&.unlink
@@ -38,7 +38,7 @@ class TestAttachment < Minitest::Test
     attachment = AutosendRb::Entities::Attachment.new(file: url)
     hash = attachment.to_h
 
-    assert_equal "image.png", hash[:filename]
+    assert_equal "image.png", hash[:fileName]
     assert_equal url, hash[:fileUrl]
     assert_nil hash[:content]
   end
@@ -55,7 +55,7 @@ class TestAttachment < Minitest::Test
     attachment = AutosendRb::Entities::Attachment.new(file: { content: content, filename: filename })
     hash = attachment.to_h
 
-    assert_equal filename, hash[:filename]
+    assert_equal filename, hash[:fileName]
     assert_equal Base64.strict_encode64(content), hash[:content]
     assert_nil hash[:contentType]
   end
@@ -69,7 +69,7 @@ class TestAttachment < Minitest::Test
     )
     hash = attachment.to_h
 
-    assert_equal filename, hash[:filename]
+    assert_equal filename, hash[:fileName]
     assert_equal Base64.strict_encode64(content), hash[:content]
     assert_equal content_type, hash[:contentType]
   end
@@ -170,7 +170,7 @@ class TestAttachment < Minitest::Test
     hash = attachment.to_h
 
     expected_hash = {
-      filename: File.basename(file.path),
+      fileName: File.basename(file.path),
       content: Base64.strict_encode64("api schema content"),
       description: "API Schema Test"
     }
@@ -190,7 +190,7 @@ class TestAttachment < Minitest::Test
     hash = attachment.to_h
 
     expected_hash = {
-      filename: File.basename(file.path),
+      fileName: File.basename(file.path),
       content: Base64.strict_encode64("api schema content")
     }
 
@@ -206,7 +206,7 @@ class TestAttachment < Minitest::Test
     hash = attachment.to_h
 
     expected_hash = {
-      filename: "basic-text.pdf",
+      fileName: "basic-text.pdf",
       fileUrl: url,
       description: "API Schema URL Test"
     }
@@ -220,7 +220,7 @@ class TestAttachment < Minitest::Test
     hash = attachment.to_h
 
     expected_hash = {
-      filename: "img.jpeg",
+      fileName: "img.jpeg",
       content: Base64.strict_encode64(File.read(url)),
       description: "API Schema URL Test"
     }
@@ -237,7 +237,7 @@ class TestAttachment < Minitest::Test
     hash = attachment.to_h
 
     expected_hash = {
-      filename: filename,
+      fileName: filename,
       content: Base64.strict_encode64(content),
       contentType: "text/plain",
       description: "API Schema Hash Test"

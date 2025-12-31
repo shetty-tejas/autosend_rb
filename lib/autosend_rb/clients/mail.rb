@@ -17,6 +17,8 @@ module AutosendRb
           payload = payload.to_h if payload.respond_to?(:to_h)
 
           response = ApiResponse.new(post(path: "/mails/send", body: payload), raise_error: raise_error)
+          return nil unless response.success?
+
           AutosendRb::Responses::SendEmail.new(response.body["data"])
         end
 
@@ -30,6 +32,8 @@ module AutosendRb
           payload = payload.to_h if payload.respond_to?(:to_h)
 
           response = ApiResponse.new(post(path: "/mails/bulk", body: payload), raise_error: raise_error)
+          return nil unless response.success?
+
           AutosendRb::Responses::BulkEmail.new(response.body["data"])
         end
       end

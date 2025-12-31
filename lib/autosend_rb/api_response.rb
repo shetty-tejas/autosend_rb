@@ -25,10 +25,14 @@ module AutosendRb
       {}
     end
 
+    def success?
+      response.is_a?(Net::HTTPSuccess)
+    end
+
     private
 
     def validate!
-      return if response.is_a?(Net::HTTPSuccess)
+      return if success?
 
       error_class = case response
                     when Net::HTTPBadRequest then BadRequestError

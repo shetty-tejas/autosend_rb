@@ -2,24 +2,28 @@
 
 require "test_helper"
 
-# TODO: This should be backed by VCR once we have it set up.
 class TestClientsMail < Minitest::Test
   def setup
     AutosendRb.configure do |config|
       config.api_key = "test_key"
       config.api_host = "https://api.autosend.com"
     end
+
+    @mock = mock("success")
+    @mock.responds_like_instance_of(Net::HTTPSuccess)
+    @mock.stubs(:is_a?).with(Net::HTTPSuccess).returns(true)
   end
 
   def test_send_email
     payload = { to: "test@example.com" }
     response_body = { "success" => true, "data" => { "emailId" => "123" } }.to_json
 
+    @mock.stubs(:body).returns(response_body)
+    @mock.stubs(:code).returns("200")
+
     # Mock the post method which comes from Concerns::Client
-    AutosendRb::Clients::Mail.expects(:post).with(path: "/mails/send",
-                                                  body: payload).returns(stub(
-                                                                           body: response_body, code: "200"
-                                                                         ))
+    Net::HTTP.expects(:start).returns(@mock)
+    URI::HTTPS.expects(:build).with(host: AutosendRb.config.api_host, path: "/v1/mails/send").once.returns(URI("https://api.autosend.com/v1/mails/send"))
 
     response = AutosendRb::Clients::Mail.send(payload)
 
@@ -39,10 +43,12 @@ class TestClientsMail < Minitest::Test
       }
     }.to_json
 
-    AutosendRb::Clients::Mail.expects(:post).with(path: "/mails/bulk",
-                                                  body: payload).returns(stub(
-                                                                           body: response_body, code: "200"
-                                                                         ))
+    @mock.stubs(:body).returns(response_body)
+    @mock.stubs(:code).returns("200")
+
+    # Mock the post method which comes from Concerns::Client
+    Net::HTTP.expects(:start).returns(@mock)
+    URI::HTTPS.expects(:build).with(host: AutosendRb.config.api_host, path: "/v1/mails/bulk").once.returns(URI("https://api.autosend.com/v1/mails/bulk"))
 
     response = AutosendRb::Clients::Mail.bulk(payload)
 
